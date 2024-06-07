@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+*.log
+tmp/
+
+
+bin/
+zsh/_project-helper
+zsh/project-helper.plugin.zsh
+application.yaml
+
+main

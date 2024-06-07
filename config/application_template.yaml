@@ -1,0 +1,59 @@
+name: project-helper-test
+path: /var/folders/xl/w4sqw5v50593_k4mpmk2bdfw0000gn/T/TestIntegration2636577814/001
+operations:
+  - description: test echo
+    name: test-echo
+    shortName: te
+    cmd: touch
+    args: []
+    executionPath: ""
+    changePath: true
+    predefinedArgsTag:
+      name: dynamic-flag
+      value: predefined-tag-value
+    runBefore:
+      - description: ""
+        name: test-before
+        shortName: ""
+        cmd: ""
+        args: []
+        executionPath: ""
+        changePath: false
+        predefinedArgsTag: null
+        runBefore: []
+        predefinedFlags: []
+    predefinedFlags: []
+  - description: test before
+    name: test-before
+    shortName: tb
+    cmd: touch
+    args:
+      - test-before.txt
+    executionPath: ""
+    changePath: true
+    predefinedArgsTag: null
+    runBefore: []
+    predefinedFlags: []
+dynamicFlags:
+  - name: dynamic-flag
+    shortName: d
+    description: dynamic flag description
+    type: string
+    default: ""
+patternTags:
+  - name: dynamic-flag
+    type: string
+    join: ""
+predefinedArgs:
+  - name: predefined-tag-value
+    type: string
+    args:
+      - name: predefined-tag-name
+        values:
+          - ${{dynamic-flag}}.txt
+  - name: dynamic-flag
+    type: array
+    args:
+      - name: predefined-tag-name
+        values:
+          - test
