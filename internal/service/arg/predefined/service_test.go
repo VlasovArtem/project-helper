@@ -86,6 +86,16 @@ func TestTryToFindPredefinedArg(t *testing.T) {
 func TestGetPredefinedArgs(t *testing.T) {
 	t.Parallel()
 
+	flags := &entity.Flags{
+		DynamicFlags: map[string]*entity.DynamicFlagValue{
+			"predefined_arg1": {
+				Name:  "predefined_arg1",
+				Type:  entity.String,
+				Value: utils.MakePointer("predefined_flag_value"),
+			},
+		},
+	}
+
 	tests := map[string]struct {
 		preconditions func(*testController)
 		request       *dto.GetPredefinedArgsRequest
@@ -110,11 +120,7 @@ func TestGetPredefinedArgs(t *testing.T) {
 					Name:  "predefined_arg1",
 					Value: "predefined_arg1_value",
 				},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1": utils.MakePointer("predefined_flag_value"),
-					},
-				},
+				Flags: flags,
 			},
 			expected: []string{"value1", "value2"},
 		},
@@ -136,11 +142,7 @@ func TestGetPredefinedArgs(t *testing.T) {
 					Name:  "predefined_arg1",
 					Value: "predefined_arg1_value",
 				},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1": utils.MakePointer("predefined_flag_value1"),
-					},
-				},
+				Flags: flags,
 			},
 			expected: []string{"wildcard"},
 		},
@@ -157,13 +159,9 @@ func TestGetPredefinedArgs(t *testing.T) {
 					Name:  "predefined_arg1",
 					Value: "predefined_arg1_value",
 				},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1": utils.MakePointer("predefined_flag_value1"),
-					},
-				},
+				Flags: flags,
 			},
-			expectedErr: errors.New("failed to get arg values for value predefined_flag_value1 or common value (*): arg * not found"),
+			expectedErr: errors.New("failed to get arg values for value predefined_flag_value or common value (*): arg * not found"),
 		},
 		"without required flag": {
 			preconditions: func(t *testController) {
@@ -175,11 +173,7 @@ func TestGetPredefinedArgs(t *testing.T) {
 			},
 			request: &dto.GetPredefinedArgsRequest{
 				PredefinedArgsTag: &config.PredefinedArgsTag{},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1": utils.MakePointer("predefined_flag_value1"),
-					},
-				},
+				Flags:             flags,
 			},
 			expectedErr: errors.New("predefined arg  not found: predefined arg not found"),
 		},
@@ -201,11 +195,7 @@ func TestGetPredefinedArgs(t *testing.T) {
 					Name:  "predefined_arg1",
 					Value: "predefined_arg1_value",
 				},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1_missing": utils.MakePointer("predefined_flag_value"),
-					},
-				},
+				Flags: &entity.Flags{},
 			},
 			expectedErr: errors.New("failed to get flag value: flag predefined_arg1 not found"),
 		},
@@ -215,11 +205,7 @@ func TestGetPredefinedArgs(t *testing.T) {
 			},
 			request: &dto.GetPredefinedArgsRequest{
 				PredefinedArgsTag: &config.PredefinedArgsTag{},
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"predefined_arg1": utils.MakePointer("predefined_flag_value1"),
-					},
-				},
+				Flags:             &entity.Flags{},
 			},
 			expectedErr: errors.New("predefined arg  not found: predefined arg not found"),
 		},

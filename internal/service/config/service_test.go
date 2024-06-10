@@ -37,9 +37,6 @@ func TestNewService(t *testing.T) {
 			},
 			output: &Service{
 				config: &applicationConfig,
-				patternTags: map[string]config.PatternTag{"pattern-tag-name": {
-					Name: "pattern-tag-name", Type: "string", Join: ", "},
-				},
 				predefinedArgs: map[string]config.PredefinedArg{"predefined-arg-name": {
 					Name: "predefined-arg-name", Type: "string", Args: config.Args{{Name: "arg", Values: []string{"value1", "value2"}}}},
 				},
@@ -102,7 +99,6 @@ func TestNewService(t *testing.T) {
 				assert.Equal(t, testCase.output.GetConfig(), svc.GetConfig())
 				assert.Equal(t, testCase.output.GetPredefinedArgs(), svc.GetPredefinedArgs())
 				assert.Equal(t, testCase.output.GetApplicationPath(), svc.GetApplicationPath())
-				assert.Equal(t, testCase.output.GetPatternTags(), svc.GetPatternTags())
 				assert.Equal(t, testCase.output.GetAdditionalArgs(), svc.GetAdditionalArgs())
 			}
 		})
@@ -197,7 +193,6 @@ func createApplication() config.Application {
 				Default:     "true",
 			},
 		},
-		PatternTags: config.PatternTags{{Name: "pattern-tag-name", Type: "string", Join: ", "}},
 		PredefinedArgs: config.PredefinedArgs{
 			{
 				Name: "predefined-arg-name",

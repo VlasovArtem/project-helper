@@ -34,8 +34,10 @@ func TestParseFlags(t *testing.T) {
 			},
 			args: []string{"--operation=test", "--flag=value"},
 			expectedFlags: &entity.Flags{
-				Operation:    "test",
-				DynamicFlags: map[string]any{"flag": utils.MakePointer("value")},
+				Operation: "test",
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {Name: "flag", Type: entity.String, Value: utils.MakePointer("value")},
+				},
 			},
 		},
 		"valid array flags": {
@@ -48,8 +50,10 @@ func TestParseFlags(t *testing.T) {
 			},
 			args: []string{"--operation=test", "--flag=value1,value2"},
 			expectedFlags: &entity.Flags{
-				Operation:    "test",
-				DynamicFlags: map[string]any{"flag": utils.MakePointer([]string{"value1", "value2"})},
+				Operation: "test",
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {Name: "flag", Type: entity.Array, Value: &[]string{"value1", "value2"}},
+				},
 			},
 		},
 		"with missing operation": {
@@ -59,8 +63,10 @@ func TestParseFlags(t *testing.T) {
 				})
 			},
 			expectedFlags: &entity.Flags{
-				Operation:    "test",
-				DynamicFlags: map[string]any{"flag": utils.MakePointer("value")},
+				Operation: "test",
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {Name: "flag", Type: entity.String, Value: utils.MakePointer("value")},
+				},
 			},
 			expectedError: errors.New("failed to validate flags: operation not provided"),
 		},

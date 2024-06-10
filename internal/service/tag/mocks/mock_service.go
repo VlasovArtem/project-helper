@@ -9,7 +9,6 @@
 package mocks
 
 import (
-	config "project-helper/internal/config"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -64,18 +63,4 @@ func (m *MockConfigService) GetApplicationPath() string {
 func (mr *MockConfigServiceMockRecorder) GetApplicationPath() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationPath", reflect.TypeOf((*MockConfigService)(nil).GetApplicationPath))
-}
-
-// GetPatternTags mocks base method.
-func (m *MockConfigService) GetPatternTags() map[string]config.PatternTag {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatternTags")
-	ret0, _ := ret[0].(map[string]config.PatternTag)
-	return ret0
-}
-
-// GetPatternTags indicates an expected call of GetPatternTags.
-func (mr *MockConfigServiceMockRecorder) GetPatternTags() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatternTags", reflect.TypeOf((*MockConfigService)(nil).GetPatternTags))
 }

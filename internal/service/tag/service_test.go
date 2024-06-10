@@ -30,18 +30,14 @@ func TestGetTagValue(t *testing.T) {
 		expectedErr   error
 	}{
 		"success with string tag": {
-			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{
-					"tag1": {
-						Name: "tag1—name",
-						Type: "string",
-					},
-				})
-			},
 			input: &dto.GetTagValueRequest{
 				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"tag1—name": utils.MakePointer("tag1—value"),
+					DynamicFlags: map[string]*entity.DynamicFlagValue{
+						"tag1": {
+							Name:  "tag1",
+							Type:  entity.String,
+							Value: utils.MakePointer("tag1—value"),
+						},
 					},
 				},
 				Operation:    operation,
@@ -50,19 +46,14 @@ func TestGetTagValue(t *testing.T) {
 			output: "tag1—value",
 		},
 		"success with string array tag": {
-			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{
-					"tag1": {
-						Name: "tag1—name",
-						Type: "array",
-						Join: ",",
-					},
-				})
-			},
 			input: &dto.GetTagValueRequest{
 				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"tag1—name": utils.MakePointer([]string{"tag1—value", "tag2—value"}),
+					DynamicFlags: map[string]*entity.DynamicFlagValue{
+						"tag1": {
+							Name:  "tag1",
+							Type:  entity.Array,
+							Value: &[]string{"tag1—value", "tag2—value"},
+						},
 					},
 				},
 				Operation:    operation,
@@ -72,7 +63,6 @@ func TestGetTagValue(t *testing.T) {
 		},
 		"success without pattern tag matches": {
 			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{})
 				t.configService.EXPECT().GetAdditionalArgs().Return(map[string]string{
 					"tag1": "tag1—value",
 				})
@@ -86,7 +76,6 @@ func TestGetTagValue(t *testing.T) {
 		},
 		"success without pattern tag matches and execution-path tag": {
 			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{})
 				t.configService.EXPECT().GetAdditionalArgs().Return(map[string]string{
 					"tag1": "tag1—value",
 				})
@@ -102,30 +91,8 @@ func TestGetTagValue(t *testing.T) {
 			},
 			output: "application-path/execution-path",
 		},
-		"with invalid type": {
-			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{
-					"tag1": {
-						Name: "tag1—name",
-						Type: "invalid",
-						Join: ",",
-					},
-				})
-			},
-			input: &dto.GetTagValueRequest{
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"tag1—name": utils.MakePointer([]string{"tag1—value", "tag2—value"}),
-					},
-				},
-				Operation:    operation,
-				ExtractedTag: "tag1",
-			},
-			expectedErr: errors.New("pattern tag type invalid not found: pattern tag type not found"),
-		},
 		"without pattern tag matches and no additional tag": {
 			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{})
 				t.configService.EXPECT().GetAdditionalArgs().Return(map[string]string{})
 			},
 			input: &dto.GetTagValueRequest{
@@ -134,42 +101,6 @@ func TestGetTagValue(t *testing.T) {
 				ExtractedTag: "tag1",
 			},
 			expectedErr: errors.New("failed to check additional args: additional arg tag1 not found: additional arg not found"),
-		},
-		"with string tag and value not found": {
-			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{
-					"tag1": {
-						Name: "tag1—name",
-						Type: "string",
-					},
-				})
-			},
-			input: &dto.GetTagValueRequest{
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{},
-				},
-				Operation:    operation,
-				ExtractedTag: "tag1",
-			},
-			expectedErr: errors.New("failed to get flag value: flag tag1—name not found"),
-		},
-		"with array tag and value not found": {
-			preconditions: func(t *testController) {
-				t.configService.EXPECT().GetPatternTags().Return(map[string]config.PatternTag{
-					"tag1": {
-						Name: "tag1—name",
-						Type: "array",
-					},
-				})
-			},
-			input: &dto.GetTagValueRequest{
-				Flags: &entity.Flags{
-					DynamicFlags: map[string]any{},
-				},
-				Operation:    operation,
-				ExtractedTag: "tag1",
-			},
-			expectedErr: errors.New("failed to get flag value: flag tag1—name not found"),
 		},
 		"with invalid request": {
 			preconditions: func(t *testController) {},

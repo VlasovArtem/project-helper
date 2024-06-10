@@ -10,7 +10,6 @@ type Application struct {
 	Operations     Operations
 	Path           string
 	DynamicFlags   DynamicFlags   `yaml:"dynamicFlags"`
-	PatternTags    PatternTags    `yaml:"patternTags"`
 	PredefinedArgs PredefinedArgs `yaml:"predefinedArgs"`
 }
 
@@ -55,16 +54,6 @@ func (a *Application) GetOperationsMap() map[string]Operation {
 	return operationsMap
 }
 
-func (a *Application) GetPatternTags() map[string]PatternTag {
-	patternTags := make(map[string]PatternTag)
-	for _, patternTag := range a.PatternTags {
-		if patternTag.Name != "" {
-			patternTags[patternTag.Name] = patternTag
-		}
-	}
-	return patternTags
-}
-
 func (a *Application) GetPredefinedArgs() map[string]PredefinedArg {
 	predefinedArgs := make(map[string]PredefinedArg)
 	for _, predefinedArg := range a.PredefinedArgs {
@@ -83,21 +72,6 @@ type DynamicFlag struct {
 	Description string
 	Type        entity.Type
 	Default     string
-}
-
-type PatternTags []PatternTag
-
-type PatternTag struct {
-	Name string
-	Type entity.Type
-	Join string
-}
-
-func (t PatternTag) GetJoin() string {
-	if t.Join == "" {
-		return " "
-	}
-	return t.Join
 }
 
 type PredefinedArgs []PredefinedArg

@@ -61,13 +61,21 @@ func (s *Service) parseFlags() (*entity.Flags, error) {
 
 			flagSet.StringVarP(&value, dynamicFlag.Name, dynamicFlag.ShortName, dynamicFlag.Default, dynamicFlag.Description)
 
-			flags.DynamicFlags[dynamicFlag.Name] = &value
+			flags.DynamicFlags[dynamicFlag.Name] = &entity.DynamicFlagValue{
+				Value: &value,
+				Name:  dynamicFlag.Name,
+				Type:  dynamicFlag.Type,
+			}
 		case entity.Array:
 			var value []string
 
 			flagSet.StringSliceVarP(&value, dynamicFlag.Name, dynamicFlag.ShortName, []string{}, dynamicFlag.Description)
 
-			flags.DynamicFlags[dynamicFlag.Name] = &value
+			flags.DynamicFlags[dynamicFlag.Name] = &entity.DynamicFlagValue{
+				Value: &value,
+				Name:  dynamicFlag.Name,
+				Type:  dynamicFlag.Type,
+			}
 		default:
 			return nil, errors.Errorf("unknown flag type %s", dynamicFlag.Type)
 		}

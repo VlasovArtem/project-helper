@@ -14,8 +14,12 @@ func TestFlagsServiceGetInitialFlags(t *testing.T) {
 
 	service := Service{
 		initialFlags: &entity.Flags{
-			DynamicFlags: map[string]any{
-				"flag": utils.MakePointer("value"),
+			DynamicFlags: map[string]*entity.DynamicFlagValue{
+				"flag": {
+					Value: utils.MakePointer("value"),
+					Type:  entity.String,
+					Name:  "flag",
+				},
 			},
 		},
 	}
@@ -35,8 +39,12 @@ func TestFlagsServiceGetOperationFlags(t *testing.T) {
 	}{
 		"no operation flags exists": {
 			flagsService: NewFlagsService(&entity.Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {
+						Value: utils.MakePointer("value"),
+						Type:  entity.String,
+						Name:  "flag",
+					},
 				},
 			}),
 			operation: config.Operation{
@@ -53,23 +61,39 @@ func TestFlagsServiceGetOperationFlags(t *testing.T) {
 				},
 			},
 			expectedFlags: &entity.Flags{
-				DynamicFlags: map[string]any{
-					"flag":         utils.MakePointer("predefined_value"),
-					"another_flag": utils.MakePointer("another_predefined_value"),
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {
+						Value: utils.MakePointer("predefined_value"),
+						Type:  entity.String,
+						Name:  "flag",
+					},
+					"another_flag": {
+						Value: utils.MakePointer("another_predefined_value"),
+						Type:  entity.String,
+						Name:  "another_flag",
+					},
 				},
 			},
 		},
 		"with operation flags exists": {
 			flagsService: &Service{
 				initialFlags: &entity.Flags{
-					DynamicFlags: map[string]any{
-						"flag": utils.MakePointer("value"),
+					DynamicFlags: map[string]*entity.DynamicFlagValue{
+						"flag": {
+							Value: utils.MakePointer("value"),
+							Type:  entity.String,
+							Name:  "flag",
+						},
 					},
 				},
 				operationFlags: map[string]*entity.Flags{
 					"operation": {
-						DynamicFlags: map[string]any{
-							"flag": utils.MakePointer("operation_value"),
+						DynamicFlags: map[string]*entity.DynamicFlagValue{
+							"flag": {
+								Value: utils.MakePointer("operation_value"),
+								Type:  entity.String,
+								Name:  "flag",
+							},
 						},
 					},
 				},
@@ -78,21 +102,33 @@ func TestFlagsServiceGetOperationFlags(t *testing.T) {
 				Name: "operation",
 			},
 			expectedFlags: &entity.Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("operation_value"),
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {
+						Value: utils.MakePointer("operation_value"),
+						Type:  entity.String,
+						Name:  "flag",
+					},
 				},
 			},
 		},
 		"no predefined flags": {
 			flagsService: NewFlagsService(&entity.Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {
+						Value: utils.MakePointer("value"),
+						Type:  entity.String,
+						Name:  "flag",
+					},
 				},
 			}),
 			operation: config.Operation{},
 			expectedFlags: &entity.Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*entity.DynamicFlagValue{
+					"flag": {
+						Value: utils.MakePointer("value"),
+						Type:  entity.String,
+						Name:  "flag",
+					},
 				},
 			},
 		},

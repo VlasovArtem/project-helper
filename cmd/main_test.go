@@ -1,3 +1,5 @@
+//go:build integration
+
 package main
 
 import (
@@ -22,12 +24,6 @@ func TestIntegration(t *testing.T) {
 				ShortName:   "d",
 				Description: "dynamic flag description",
 				Type:        entity.String,
-			},
-		},
-		PatternTags: config.PatternTags{
-			{
-				Name: "dynamic-flag",
-				Type: entity.String,
 			},
 		},
 		PredefinedArgs: config.PredefinedArgs{

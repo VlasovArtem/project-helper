@@ -40,10 +40,6 @@ dynamicFlags:
     description: dynamic flag description
     type: string
     default: ""
-patternTags:
-  - name: dynamic-flag
-    type: string
-    join: ""
 predefinedArgs:
   - name: predefined-tag-value
     type: string

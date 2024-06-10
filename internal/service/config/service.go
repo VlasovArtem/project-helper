@@ -16,7 +16,6 @@ import (
 
 type Service struct {
 	config         *config.Application
-	patternTags    map[string]config.PatternTag
 	predefinedArgs map[string]config.PredefinedArg
 	operationsMap  map[string]config.Operation
 	additionalArgs map[string]string
@@ -51,7 +50,6 @@ func initService(s *Service) error {
 		return errors.Wrap(err, "failed to decode config file")
 	}
 
-	s.patternTags = s.config.GetPatternTags()
 	s.predefinedArgs = s.config.GetPredefinedArgs()
 	s.operationsMap = s.config.GetOperationsMap()
 	s.additionalArgs = map[string]string{
@@ -63,10 +61,6 @@ func initService(s *Service) error {
 
 func (s *Service) GetConfig() *config.Application {
 	return s.config
-}
-
-func (s *Service) GetPatternTags() map[string]config.PatternTag {
-	return s.patternTags
 }
 
 func (s *Service) GetPredefinedArgs() map[string]config.PredefinedArg {

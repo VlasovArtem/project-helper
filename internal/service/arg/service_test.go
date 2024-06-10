@@ -11,7 +11,6 @@ import (
 	"project-helper/internal/domain/dto"
 	"project-helper/internal/domain/entity"
 	"project-helper/internal/service/arg/mocks"
-	"project-helper/internal/utils"
 )
 
 func TestPrepareArgs(t *testing.T) {
@@ -34,17 +33,9 @@ func TestPrepareArgs(t *testing.T) {
 						Value: "predefined_arg1_value",
 					},
 				}).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.enhanceArgService.EXPECT().GetEnhancedOperationArgs(&dto.GetEnhancedOperationArgs{
-					Flags: &entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					},
+					Flags: &entity.Flags{},
 					Operation: config.Operation{
 						Name:            "test",
 						PredefinedFlags: config.PredefinedFlags{},
@@ -56,11 +47,7 @@ func TestPrepareArgs(t *testing.T) {
 					},
 				}).Return([]string{"enhanced_operation_arg1", "enhanced_operation_arg2"}, nil)
 				t.enhanceArgService.EXPECT().EnhanceArgs(&dto.EnhanceArgsRequest{
-					Flags: &entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					},
+					Flags: &entity.Flags{},
 					Operation: config.Operation{
 						Name:            "test",
 						PredefinedFlags: config.PredefinedFlags{},
@@ -94,17 +81,9 @@ func TestPrepareArgs(t *testing.T) {
 						Value: "predefined_arg1_value",
 					},
 				}).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.predefinedArgSvc.EXPECT().GetPredefinedArgValues(&dto.GetPredefinedArgsRequest{
-					Flags: &entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					},
+					Flags: &entity.Flags{},
 					PredefinedArgsTag: &config.PredefinedArgsTag{
 						Name:  "predefined_arg1",
 						Value: "predefined_arg1_value",
@@ -112,11 +91,7 @@ func TestPrepareArgs(t *testing.T) {
 				}).
 					Return([]string{"predefined_arg1"}, nil)
 				t.enhanceArgService.EXPECT().EnhanceArgs(&dto.EnhanceArgsRequest{
-					Flags: &entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					},
+					Flags: &entity.Flags{},
 					Operation: config.Operation{
 						Name:            "test",
 						PredefinedFlags: config.PredefinedFlags{},
@@ -145,17 +120,9 @@ func TestPrepareArgs(t *testing.T) {
 					PredefinedFlags: config.PredefinedFlags{},
 					Args:            []string{"arg1"},
 				}).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"arg1": utils.MakePointer("arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.enhanceArgService.EXPECT().EnhanceArgs(&dto.EnhanceArgsRequest{
-					Flags: &entity.Flags{
-						DynamicFlags: map[string]any{
-							"arg1": utils.MakePointer("arg1_name"),
-						},
-					},
+					Flags: &entity.Flags{},
 					Operation: config.Operation{
 						Name:            "test",
 						PredefinedFlags: config.PredefinedFlags{},
@@ -177,11 +144,7 @@ func TestPrepareArgs(t *testing.T) {
 					Name:            "test",
 					PredefinedFlags: config.PredefinedFlags{},
 				}).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"arg1": utils.MakePointer("arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 			},
 			operation: config.Operation{
 				Name:            "test",
@@ -192,11 +155,7 @@ func TestPrepareArgs(t *testing.T) {
 		"with error on get predefined args": {
 			preconditions: func(t *testController) {
 				t.flagService.EXPECT().GetOperationFlags(gomock.Any()).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.predefinedArgSvc.EXPECT().GetPredefinedArgValues(gomock.Any()).
 					Return([]string{}, assert.AnError)
 			},
@@ -213,11 +172,7 @@ func TestPrepareArgs(t *testing.T) {
 		"with error on get enhanced operation args": {
 			preconditions: func(t *testController) {
 				t.flagService.EXPECT().GetOperationFlags(gomock.Any()).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.enhanceArgService.EXPECT().GetEnhancedOperationArgs(gomock.Any()).
 					Return([]string{}, assert.AnError)
 			},
@@ -235,11 +190,7 @@ func TestPrepareArgs(t *testing.T) {
 		"with error on enhance args": {
 			preconditions: func(t *testController) {
 				t.flagService.EXPECT().GetOperationFlags(gomock.Any()).
-					Return(&entity.Flags{
-						DynamicFlags: map[string]any{
-							"predefined_arg1": utils.MakePointer("predefined_arg1_name"),
-						},
-					})
+					Return(&entity.Flags{})
 				t.predefinedArgSvc.EXPECT().GetPredefinedArgValues(gomock.Any()).
 					Return([]string{"predefined_arg1"}, nil)
 				t.enhanceArgService.EXPECT().EnhanceArgs(gomock.Any()).

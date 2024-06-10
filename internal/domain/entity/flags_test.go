@@ -9,6 +9,126 @@ import (
 	"project-helper/internal/utils"
 )
 
+func TestDynamicFlagValueGetString(t *testing.T) {
+	//func GetString(d *DynamicFlagValue) (string, error) {
+	//	if d == nil {
+	//		return "", domainerrors.ErrorNilInput
+	//	}
+	//
+	//	switch d.Type {
+	//	case String:
+	//		value, ok := d.Value.(*string)
+	//		if !ok {
+	//			return "", errors.Wrap(errInvalidFlagTypeValue, "flag is not a string")
+	//		}
+	//
+	//		return *value, nil
+	//	case Array:
+	//		value, ok := d.Value.(*[]string)
+	//		if !ok {
+	//			return "", errors.Wrap(errInvalidFlagTypeValue, "flag is not an array")
+	//		}
+	//
+	//		if value == nil {
+	//			return "", errors.Wrap(errInvalidFlagTypeValue, "flag is nil")
+	//		}
+	//
+	//		if len(*value) == 0 {
+	//			return "", errors.Wrap(errInvalidFlagTypeValue, "flag is empty")
+	//		}
+	//
+	//		return strings.Join(*value, ","), nil
+	//	default:
+	//		return "", errors.Wrapf(errInvalidFlagTypeValue, "flag type '%s' is not supported", d.Type)
+	//	}
+	//}
+
+	t.Parallel()
+
+	tests := map[string]struct {
+		dynamicFlagValue *DynamicFlagValue
+		expectedValue    string
+		expectedError    error
+	}{
+		"success string": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  String,
+				Value: utils.MakePointer("value"),
+			},
+			expectedValue: "value",
+		},
+		"success array": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  Array,
+				Value: utils.MakePointer([]string{"value1", "value2"}),
+			},
+			expectedValue: "value1,value2",
+		},
+		"nil": {
+			dynamicFlagValue: nil,
+			expectedError:    errors.New("nil input"),
+		},
+		"not a string": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  String,
+				Value: utils.MakePointer(42),
+			},
+			expectedError: errors.New("flag is not a string: invalid flag type value"),
+		},
+		"not an array": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  Array,
+				Value: utils.MakePointer("value"),
+			},
+			expectedError: errors.New("flag is not an array: invalid flag type value"),
+		},
+		"array nil": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  Array,
+				Value: nil,
+			},
+			expectedError: errors.New("flag is not an array: invalid flag type value"),
+		},
+		"array empty": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  Array,
+				Value: utils.MakePointer([]string{}),
+			},
+			expectedError: errors.New("flag is empty: invalid flag type value"),
+		},
+		"unsupported type": {
+			dynamicFlagValue: &DynamicFlagValue{
+				Name:  "flag",
+				Type:  "unsupported",
+				Value: utils.MakePointer("value"),
+			},
+			expectedError: errors.New("flag type 'unsupported' is not supported: invalid flag type value"),
+		},
+	}
+
+	for name, testCase := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			value, err := GetString(testCase.dynamicFlagValue)
+
+			if testCase.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, testCase.expectedError.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, testCase.expectedValue, value)
+			}
+		})
+	}
+}
+
 func TestNewFlags(t *testing.T) {
 	t.Parallel()
 
@@ -62,14 +182,18 @@ func TestRunFlagsGetFlagStringValue(t *testing.T) {
 	}{
 		"with value": {
 			runFlags: &Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  String,
+						Value: utils.MakePointer("value"),
+					},
 				},
 			},
 			expectedValue: "value",
 		},
 		"without value": {
-			runFlags: &Flags{DynamicFlags: map[string]any{}},
+			runFlags: &Flags{DynamicFlags: map[string]*DynamicFlagValue{}},
 		},
 	}
 
@@ -94,19 +218,23 @@ func TestGetRequiredFlagStringValue(t *testing.T) {
 	}{
 		"with value": {
 			runFlags: &Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  String,
+						Value: utils.MakePointer("value"),
+					},
 				},
 			},
 			expectedValue: "value",
 		},
 		"without value": {
-			runFlags:      &Flags{DynamicFlags: map[string]any{}},
+			runFlags:      &Flags{DynamicFlags: map[string]*DynamicFlagValue{}},
 			expectedError: errors.New("flag flag not found"),
 		},
 		"nil value": {
 			runFlags: &Flags{
-				DynamicFlags: map[string]any{
+				DynamicFlags: map[string]*DynamicFlagValue{
 					"flag": nil,
 				},
 			},
@@ -114,8 +242,12 @@ func TestGetRequiredFlagStringValue(t *testing.T) {
 		},
 		"not a string": {
 			runFlags: &Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer(42),
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  String,
+						Value: utils.MakePointer(42),
+					},
 				},
 			},
 			expectedError: errors.New("flag flag is not a string"),
@@ -148,27 +280,37 @@ func TestGetRequiredFlagArrayValue(t *testing.T) {
 		expectedError error
 	}{
 		"with value": {
-			flags: &Flags{DynamicFlags: map[string]any{
-				"flag": utils.MakePointer([]string{"value1", "value2"}),
-			},
+			flags: &Flags{
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  Array,
+						Value: utils.MakePointer([]string{"value1", "value2"}),
+					},
+				},
 			},
 			expectedValue: []string{"value1", "value2"},
 		},
 		"without value": {
-			flags:         &Flags{DynamicFlags: map[string]any{}},
+			flags:         &Flags{DynamicFlags: map[string]*DynamicFlagValue{}},
 			expectedError: errors.New("flag flag not found"),
 		},
 		"nil value": {
-			flags: &Flags{DynamicFlags: map[string]any{
-				"flag": nil,
-			},
+			flags: &Flags{
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": nil,
+				},
 			},
 			expectedError: errors.New("flag flag is nil"),
 		},
 		"not an array": {
 			flags: &Flags{
-				DynamicFlags: map[string]any{
-					"flag": utils.MakePointer("value"),
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  Array,
+						Value: utils.MakePointer("value"),
+					},
 				},
 			},
 			expectedError: errors.New("flag flag is not an array"),
@@ -200,14 +342,19 @@ func TestGetFlagArrayValue(t *testing.T) {
 		expectedValue []string
 	}{
 		"with value": {
-			flags: &Flags{DynamicFlags: map[string]any{
-				"flag": utils.MakePointer([]string{"value1", "value2"}),
-			},
+			flags: &Flags{
+				DynamicFlags: map[string]*DynamicFlagValue{
+					"flag": {
+						Name:  "flag",
+						Type:  Array,
+						Value: &[]string{"value1", "value2"},
+					},
+				},
 			},
 			expectedValue: []string{"value1", "value2"},
 		},
 		"without value": {
-			flags:         &Flags{DynamicFlags: map[string]any{}},
+			flags:         &Flags{DynamicFlags: map[string]*DynamicFlagValue{}},
 			expectedValue: make([]string, 0),
 		},
 	}
